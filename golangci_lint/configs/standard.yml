@@ -4,6 +4,7 @@ version: "2"
 # This config complements nogo (see //nogo:standard_nogo) and focuses on:
 # - Code style and formatting
 # - Error handling
+# - Security vulnerabilities
 # - Best practices
 # - Checks not available in nogo
 
@@ -15,70 +16,102 @@ linters:
     # === Static Analysis ===
     - staticcheck    # Comprehensive static analysis (includes many checks)
 
+    # === Security ===
+    - gosec          # Security-focused linter (checks for common vulnerabilities)
+    - bidichk        # Detects dangerous Unicode sequences (Trojan Source attacks)
+    - bodyclose      # Ensures HTTP response bodies are closed
+    - copyloopvar    # Detects places where loop variables are copied (replaces exportloopref)
+
   disable:
     # Disable govet - nogo covers all these checks at compile time
     # This avoids duplication and provides faster lint times
     - govet
 
-linters-settings:
-  errcheck:
-    check-type-assertions: true
-    check-blank: true
-    exclude-functions:
-      # Common cases where ignoring errors is acceptable
-      - (io.Closer).Close
-      - (io.Writer).Write
+  settings:
+    errcheck:
+      check-type-assertions: true
+      # Allow explicit error ignores with underscore (_)
+      # This is appropriate for best-effort cleanup operations
+      check-blank: false
+      exclude-functions:
+        # Common cases where ignoring errors is acceptable
+        - (io.Closer).Close
+        - (io.Writer).Write
+        - (os.File).Close
+        - os.Remove
 
-  revive:
-    rules:
-      - name: var-naming
-        severity: warning
-        disabled: false
-      - name: package-comments
-        severity: warning
-        disabled: false
-      - name: exported
-        severity: warning
-        disabled: false
-      - name: indent-error-flow
-        severity: warning
-        disabled: false
-      - name: blank-imports
-        severity: warning
-        disabled: false
-      - name: context-as-argument
-        severity: warning
-        disabled: false
-      - name: dot-imports
-        severity: warning
-        disabled: false
-      - name: error-return
-        severity: warning
-        disabled: false
-      - name: error-strings
-        severity: warning
-        disabled: false
-      - name: error-naming
-        severity: warning
-        disabled: false
-      - name: increment-decrement
-        severity: warning
-        disabled: false
-      - name: range
-        severity: warning
-        disabled: false
-      - name: receiver-naming
-        severity: warning
-        disabled: false
-      - name: time-naming
-        severity: warning
-        disabled: false
-      - name: var-declaration
-        severity: warning
-        disabled: false
+    revive:
+      rules:
+        - name: var-naming
+          severity: warning
+          disabled: false
+        - name: package-comments
+          severity: warning
+          disabled: false
+        - name: exported
+          severity: warning
+          disabled: false
+        - name: indent-error-flow
+          severity: warning
+          disabled: false
+        - name: blank-imports
+          severity: warning
+          disabled: false
+        - name: context-as-argument
+          severity: warning
+          disabled: false
+        - name: dot-imports
+          severity: warning
+          disabled: false
+        - name: error-return
+          severity: warning
+          disabled: false
+        - name: error-strings
+          severity: warning
+          disabled: false
+        - name: error-naming
+          severity: warning
+          disabled: false
+        - name: increment-decrement
+          severity: warning
+          disabled: false
+        - name: range
+          severity: warning
+          disabled: false
+        - name: receiver-naming
+          severity: warning
+          disabled: false
+        - name: time-naming
+          severity: warning
+          disabled: false
+        - name: var-declaration
+          severity: warning
+          disabled: false
 
-  staticcheck:
-    checks: ["all"]
+    staticcheck:
+      checks: ["all"]
+
+    gosec:
+      # Exclude specific rules
+      excludes:
+        - G104  # Audit errors not checked (already covered by errcheck)
+        - G301  # Directory permissions (0755 is standard Unix practice)
+        - G304  # File inclusion via variable (too noisy for file I/O tools)
+        - G306  # File permissions (0644 is standard Unix practice)
+        - G307  # Deferring unsafe method (too noisy)
+
+      # Set confidence threshold: low, medium, high
+      # Medium balances thoroughness with false positive rate
+      confidence: medium
+
+      # Configure specific rules
+      config:
+        # G101: Hard-coded credentials detection
+        G101:
+          pattern: "(?i)(password|pwd|secret|token|api[_-]?key|private[_-]?key|credentials?)"
+          ignore_entropy: false
+          entropy_threshold: "80.0"
+          per_char_threshold: "3.0"
 
 issues:
   # Exclude common false positives

@@ -87,6 +87,9 @@ func PrepareTemplateData(versions []Version) *TemplateData {
 		}
 	}
 
+	// At this point, we know len(versions) > 0
+	defaultVersion := versions[0].Tag // First version is latest
+
 	versionData := make([]VersionData, 0, len(versions))
 	for _, v := range versions {
 		vd := VersionData{
@@ -98,7 +101,7 @@ func PrepareTemplateData(versions []Version) *TemplateData {
 
 	return &TemplateData{
 		GeneratedAt:    time.Now().UTC().Format(time.RFC3339),
-		DefaultVersion: versions[0].Tag, // First version is latest
+		DefaultVersion: defaultVersion,
 		Versions:       versionData,
 	}
 }
