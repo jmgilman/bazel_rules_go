@@ -4,7 +4,8 @@ Shared Bazel extensions / rules used across @jmgilman's repositories.
 
 module(
     name = "jmgilman_rules_go",
-    version = "0.1.1",
+    # Version is managed by the BCR registry through patches.
+    version = "",
 )
 
 bazel_dep(name = "bazel_skylib", version = "1.8.2")
