@@ -1,0 +1,5 @@
+{
+  "integrity": "",
+  "strip_prefix": "jmgilman_rules_go-{VERSION}",
+  "url": "https://github.com/{OWNER}/{REPO}/releases/download/{TAG}/jmgilman_rules_go-{VERSION}.tar.gz"
+}

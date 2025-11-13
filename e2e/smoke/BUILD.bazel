@@ -1,0 +1,21 @@
+load("@rules_go//go:def.bzl", "go_binary", "go_library", "go_test")
+
+go_library(
+    name = "smoke_lib",
+    srcs = ["main.go"],
+    importpath = "github.com/jmgilman/smoke_test",
+    visibility = ["//visibility:private"],
+)
+
+go_binary(
+    name = "smoke",
+    embed = [":smoke_lib"],
+    visibility = ["//visibility:public"],
+)
+
+# Simple test to verify the module works
+go_test(
+    name = "smoke_test",
+    srcs = ["smoke_test.go"],
+    embed = [":smoke_lib"],
+)

@@ -1,0 +1,42 @@
+name: Update Versions Utility CI
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - "tools/update_versions/**"
+      - ".github/workflows/update-versions-ci.yml"
+  pull_request:
+    branches: [master]
+    paths:
+      - "tools/update_versions/**"
+      - ".github/workflows/update-versions-ci.yml"
+  workflow_dispatch:
+
+jobs:
+  build-and-test:
+    name: Build and Test Update Versions
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Bazel
+        uses: bazel-contrib/setup-bazel@0.15.0
+        with:
+          # Recommended: Use Bazelisk to automatically use the correct Bazel version
+          bazelisk-cache: true
+          # Enable disk cache for faster builds
+          disk-cache: update-versions-ci
+          # Enable repository cache for external dependencies
+          repository-cache: true
+
+      - name: Build update_versions binary
+        run: bazel build //tools/update_versions:update_versions
+
+      - name: Run tests
+        run: bazel test //tools/update_versions:update_versions_test --test_output=errors
+
+      - name: Run linting
+        run: bazel test //tools/update_versions:lint --test_output=errors

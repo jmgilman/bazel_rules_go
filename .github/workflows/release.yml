@@ -1,0 +1,110 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+
+permissions:
+  contents: write
+  id-token: write
+  attestations: write
+
+jobs:
+  release:
+    name: Create Release
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Extract version from tag
+        id: version
+        run: |
+          VERSION=${GITHUB_REF#refs/tags/v}
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "tag=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+
+      - name: Verify MODULE.bazel version matches tag
+        run: |
+          # Extract only the module version (first version in the file, inside module() block)
+          MODULE_VERSION=$(awk '/^module\(/,/^\)/{if(/version = /) {gsub(/.*version = "/, ""); gsub(/".*/, ""); print; exit}}' MODULE.bazel)
+          TAG_VERSION="${{ steps.version.outputs.version }}"
+
+          if [ "$MODULE_VERSION" != "$TAG_VERSION" ]; then
+            echo "ERROR: Version mismatch!"
+            echo "  MODULE.bazel version: $MODULE_VERSION"
+            echo "  Git tag version: $TAG_VERSION"
+            exit 1
+          fi
+
+          echo "✅ Version verified: $MODULE_VERSION"
+
+      - name: Create release archive
+        run: |
+          # Create a reproducible tar.gz archive
+          # Use --mtime to ensure consistent timestamps
+          ARCHIVE_NAME="jmgilman_rules_go-${{ steps.version.outputs.version }}.tar.gz"
+
+          # Create archive in /tmp to avoid "file changed as we read it" errors
+          tar --create \
+            --gzip \
+            --file "/tmp/$ARCHIVE_NAME" \
+            --transform "s,^,jmgilman_rules_go-${{ steps.version.outputs.version }}/," \
+            --mtime="1970-01-01 00:00:00 UTC" \
+            --owner=0 \
+            --group=0 \
+            --numeric-owner \
+            --sort=name \
+            --exclude='.git' \
+            --exclude='.git/*' \
+            --exclude='bazel-*' \
+            --exclude='.claude' \
+            --exclude='*.swp' \
+            --exclude='*~' \
+            .
+
+          # Move archive to current directory
+          mv "/tmp/$ARCHIVE_NAME" "$ARCHIVE_NAME"
+
+          echo "archive_name=$ARCHIVE_NAME" >> $GITHUB_OUTPUT
+          echo "archive_path=$(pwd)/$ARCHIVE_NAME" >> $GITHUB_OUTPUT
+
+          # Calculate and display SHA256 for verification
+          sha256sum "$ARCHIVE_NAME"
+        id: archive
+
+      - name: Attest release archive
+        uses: actions/attest-build-provenance@v2
+        id: attest
+        with:
+          subject-path: ${{ steps.archive.outputs.archive_path }}
+
+      - name: Rename attestation bundle to expected name
+        run: |
+          # The attestation action creates a bundle, we need to rename it to the expected format
+          ARCHIVE_NAME="${{ steps.archive.outputs.archive_name }}"
+          ATTESTATION_NAME="${ARCHIVE_NAME}.intoto.jsonl"
+
+          # Copy the attestation bundle to the expected filename
+          cp "${{ steps.attest.outputs.bundle-path }}" "$ATTESTATION_NAME"
+
+          echo "attestation_name=$ATTESTATION_NAME" >> $GITHUB_OUTPUT
+
+          # Display info
+          echo "✅ Attestation saved as: $ATTESTATION_NAME"
+          ls -lh "$ATTESTATION_NAME"
+        id: attestation
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.version.outputs.tag }}
+          name: ${{ steps.version.outputs.tag }}
+          generate_release_notes: true
+          draft: false
+          prerelease: false
+          files: |
+            ${{ steps.archive.outputs.archive_name }}
+            ${{ steps.attestation.outputs.attestation_name }}

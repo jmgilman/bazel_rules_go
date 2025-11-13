@@ -1,0 +1,26 @@
+{
+  "composites": {
+    "exclude_files": {
+      ".*_test\\.go$": "Allow unkeyed fields in test files for readability"
+    }
+  },
+
+  "loopclosure": {
+    "exclude_files": {
+      ".*_test\\.go$": "Tests often intentionally capture loop variables"
+    }
+  },
+
+  "tests": {
+    "exclude_files": {
+      "\\.pb\\.go$": "Skip protobuf generated code",
+      ".*generated.*\\.go$": "Skip other generated code"
+    }
+  },
+
+  "structtag": {
+    "exclude_files": {
+      "\\.pb\\.go$": "Skip protobuf generated code"
+    }
+  }
+}

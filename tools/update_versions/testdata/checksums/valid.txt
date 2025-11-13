@@ -1,0 +1,7 @@
+aee6e16af4dfa60dd3c4e39536edc905f28369fda3c138090db00c8233cfe450  golangci-lint-2.6.1-darwin-amd64.tar.gz
+402e903029391f1b6383cc63c8d0fcd38e879a4dfe3a0aff258a1817d7a296ec  golangci-lint-2.6.1-darwin-arm64.tar.gz
+c22e188e46aff9b140588abe6828ba271b600ae82b2d6a4f452196a639c17ec0  golangci-lint-2.6.1-linux-amd64.tar.gz
+1c22b899f2dd84f9638e0e0352a319a2867b0bb082c5323ad50d8713b65bb793  golangci-lint-2.6.1-linux-arm64.tar.gz
+d47312b0bd87fa4d0b161001bcebaaaf59203d13444e624b00d2dd240b168dc8  golangci-lint-2.6.1-windows-386.zip
+b6edeea3d1d52331e98dc6378f710cfe2d752ca1ba09032fe60e62a87a27a25f  golangci-lint-2.6.1-windows-amd64.zip
+eff5849a62c2b0076ab55a4b40379c8636028bccfdb8af3cc54af155e18f25dd  golangci-lint-2.6.1-windows-arm64.zip

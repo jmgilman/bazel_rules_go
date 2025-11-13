@@ -1,0 +1,5 @@
+fa784bd10b994b01c732d778b8e6498510a9a74d051b6d258b527361f93716af  golangci-lint-2.6.1-linux-386.deb
+03c336caf7f9b3b5b2de6f0f006557186204497473ef58f45b73fc33f2f2a905  golangci-lint-2.6.1-linux-386.rpm
+7da3df0b20249b7f3ad61f0200a7c46a19b13948a436d5d12819c0f347caa2d6  golangci-lint-2.6.1-linux-amd64.deb
+b006782cb5ac0cf77afb615c31ac399124ad3be8a45ba5625895882aea6f28ae  golangci-lint-2.6.1-linux-amd64.rpm
+ba030e730aa764b9b57fac24ffa049590ba9de6112ad9dd325792d55e9d0b95b  golangci-lint-2.6.1-source.tar.gz

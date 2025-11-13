@@ -1,0 +1,17 @@
+"""
+Provides the golangci-lint binary for the current platform.
+"""
+
+exports_files(["golangci-lint"])
+
+filegroup(
+    name = "binary",
+    srcs = ["golangci-lint"],
+    visibility = ["//visibility:public"],
+)
+
+sh_binary(
+    name = "golangci_lint",
+    srcs = ["golangci-lint"],
+    visibility = ["//visibility:public"],
+)

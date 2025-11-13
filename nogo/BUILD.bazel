@@ -1,0 +1,83 @@
+"""
+Standard nogo configuration for Go static analysis.
+
+This provides compile-time checks using golang.org/x/tools/go/analysis.
+These checks run during compilation and will FAIL THE BUILD if issues are found.
+
+Use golangci-lint (via //golangci_lint) for style and non-blocking checks.
+"""
+
+load("@rules_go//go:def.bzl", "nogo")
+
+nogo(
+    name = "standard_nogo",
+    deps = [
+        # Assembly declarations - ensures assembly functions match Go signatures
+        "@org_golang_x_tools//go/analysis/passes/asmdecl",
+
+        # Assignment checks - detects useless assignments
+        "@org_golang_x_tools//go/analysis/passes/assign",
+
+        # Atomic operations - detects incorrect usage of sync/atomic
+        "@org_golang_x_tools//go/analysis/passes/atomic",
+
+        # Boolean conditions - detects mistakes in boolean expressions
+        "@org_golang_x_tools//go/analysis/passes/bools",
+
+        # Build tags - checks build tag syntax
+        "@org_golang_x_tools//go/analysis/passes/buildtag",
+
+        # CGO calls - checks cgo pointer passing rules
+        "@org_golang_x_tools//go/analysis/passes/cgocall",
+
+        # Composite literals - checks for unkeyed fields in composite literals
+        "@org_golang_x_tools//go/analysis/passes/composite",
+
+        # Copy locks - checks for locks passed by value
+        "@org_golang_x_tools//go/analysis/passes/copylock",
+
+        # errors.As usage - checks for correct errors.As usage
+        "@org_golang_x_tools//go/analysis/passes/errorsas",
+
+        # HTTP response handling - checks for unclosed response bodies
+        "@org_golang_x_tools//go/analysis/passes/httpresponse",
+
+        # Loop closure variables - detects references to loop variables from closures
+        "@org_golang_x_tools//go/analysis/passes/loopclosure",
+
+        # Lost cancel - checks for context cancellation
+        "@org_golang_x_tools//go/analysis/passes/lostcancel",
+
+        # Nil func comparison - detects useless nil func comparisons
+        "@org_golang_x_tools//go/analysis/passes/nilfunc",
+
+        # Printf format strings - checks printf-style format strings
+        "@org_golang_x_tools//go/analysis/passes/printf",
+
+        # Shift operations - checks for suspicious shift operations
+        "@org_golang_x_tools//go/analysis/passes/shift",
+
+        # Standard method signatures - checks for misspelled or incorrect method signatures
+        "@org_golang_x_tools//go/analysis/passes/stdmethods",
+
+        # Struct tags - checks struct field tags
+        "@org_golang_x_tools//go/analysis/passes/structtag",
+
+        # Test functions - checks test function signatures
+        "@org_golang_x_tools//go/analysis/passes/tests",
+
+        # Unmarshal usage - checks for passing non-pointer to unmarshal
+        "@org_golang_x_tools//go/analysis/passes/unmarshal",
+
+        # Unreachable code - detects unreachable code
+        "@org_golang_x_tools//go/analysis/passes/unreachable",
+
+        # Unsafe pointer - checks for invalid conversions of uintptr to unsafe.Pointer
+        "@org_golang_x_tools//go/analysis/passes/unsafeptr",
+
+        # Unused result - checks for unused results of certain function calls
+        "@org_golang_x_tools//go/analysis/passes/unusedresult",
+    ],
+    config = ":nogo_config.json",
+    visibility = ["//visibility:public"],
+)

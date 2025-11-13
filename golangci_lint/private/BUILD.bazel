@@ -1,0 +1,7 @@
+# Private implementation details for golangci-lint extension
+
+exports_files([
+    "versions.bzl",
+    "golangci_lint_binary.BUILD.bazel",
+    "golangci_lint_test.bzl",
+])

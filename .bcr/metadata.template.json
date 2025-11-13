@@ -1,0 +1,15 @@
+{
+  "homepage": "https://github.com/jmgilman/bazel_rules_go",
+  "maintainers": [
+    {
+      "email": "joshuagilman@gmail.com",
+      "github": "jmgilman",
+      "name": "Joshua Gilman"
+    }
+  ],
+  "repository": [
+    "github:jmgilman/bazel_rules_go"
+  ],
+  "versions": [],
+  "yanked_versions": {}
+}

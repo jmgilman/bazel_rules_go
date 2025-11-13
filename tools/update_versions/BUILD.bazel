@@ -1,0 +1,53 @@
+load("@rules_go//go:def.bzl", "go_binary", "go_library", "go_test")
+load("//golangci_lint:defs.bzl", "golangci_lint_test")
+
+go_library(
+    name = "update_versions_lib",
+    srcs = [
+        "checksum.go",
+        "github.go",
+        "mock_github.go",
+        "runner.go",
+        "template.go",
+    ],
+    embedsrcs = ["template.bzl.tmpl"],
+    importpath = "github.com/josh/rules_tooling/tools/update_versions",
+    visibility = ["//visibility:private"],
+    deps = ["@com_github_google_go_github_v62//github"],
+)
+
+go_binary(
+    name = "update_versions",
+    srcs = ["main.go"],
+    embed = [":update_versions_lib"],
+    visibility = ["//visibility:public"],
+)
+
+go_test(
+    name = "update_versions_test",
+    size = "small",
+    srcs = [
+        "checksum_test.go",
+        "integration_test.go",
+        "template_test.go",
+    ],
+    data = glob(["testdata/**/*"]),
+    embed = [":update_versions_lib"],
+    deps = [
+        "@com_github_stretchr_testify//assert",
+        "@com_github_stretchr_testify//require",
+    ],
+)
+
+golangci_lint_test(
+    name = "lint",
+    size = "small",
+    config = "//golangci_lint/configs:standard.yml",
+    data = [
+        "go.mod",
+        "go.sum",
+    ] + glob([
+        "*.go",
+        "*.tmpl",
+    ]),
+)

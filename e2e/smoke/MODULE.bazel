@@ -1,0 +1,22 @@
+"""
+Smoke test for jmgilman_rules_go.
+This module tests basic functionality by importing and using the module.
+"""
+
+module(
+    name = "smoke_test",
+    version = "0.0.0",
+)
+
+bazel_dep(name = "jmgilman_rules_go", version = "0.0.0")
+local_path_override(
+    module_name = "jmgilman_rules_go",
+    path = "../..",
+)
+
+bazel_dep(name = "rules_go", version = "0.58.3")
+bazel_dep(name = "gazelle", version = "0.41.0")
+
+# Configure Go SDK
+go_sdk = use_extension("@rules_go//go:extensions.bzl", "go_sdk")
+go_sdk.download(version = "1.25.3")

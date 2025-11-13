@@ -1,0 +1,11 @@
+"""
+Standard golangci-lint configurations.
+
+These configs complement the nogo analyzers (//nogo:standard_nogo) and focus on
+style, error handling, and checks not available in nogo.
+"""
+
+exports_files(
+    ["standard.yml"],
+    visibility = ["//visibility:public"],
+)

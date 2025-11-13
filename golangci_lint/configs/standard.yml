@@ -1,0 +1,140 @@
+version: "2"
+
+# Standard golangci-lint configuration for rules_tooling
+# This config complements nogo (see //nogo:standard_nogo) and focuses on:
+# - Code style and formatting
+# - Error handling
+# - Best practices
+# - Checks not available in nogo
+
+linters:
+  enable:
+    # === Error Handling ===
+    - errcheck       # Checks for unchecked errors
+
+    # === Static Analysis ===
+    - staticcheck    # Comprehensive static analysis (includes many checks)
+
+  disable:
+    # Disable govet - nogo covers all these checks at compile time
+    # This avoids duplication and provides faster lint times
+    - govet
+
+linters-settings:
+  errcheck:
+    check-type-assertions: true
+    check-blank: true
+    exclude-functions:
+      # Common cases where ignoring errors is acceptable
+      - (io.Closer).Close
+      - (io.Writer).Write
+
+  revive:
+    rules:
+      - name: var-naming
+        severity: warning
+        disabled: false
+      - name: package-comments
+        severity: warning
+        disabled: false
+      - name: exported
+        severity: warning
+        disabled: false
+      - name: indent-error-flow
+        severity: warning
+        disabled: false
+      - name: blank-imports
+        severity: warning
+        disabled: false
+      - name: context-as-argument
+        severity: warning
+        disabled: false
+      - name: dot-imports
+        severity: warning
+        disabled: false
+      - name: error-return
+        severity: warning
+        disabled: false
+      - name: error-strings
+        severity: warning
+        disabled: false
+      - name: error-naming
+        severity: warning
+        disabled: false
+      - name: increment-decrement
+        severity: warning
+        disabled: false
+      - name: range
+        severity: warning
+        disabled: false
+      - name: receiver-naming
+        severity: warning
+        disabled: false
+      - name: time-naming
+        severity: warning
+        disabled: false
+      - name: var-declaration
+        severity: warning
+        disabled: false
+
+  staticcheck:
+    checks: ["all"]
+
+issues:
+  # Exclude common false positives
+  exclude-rules:
+    # Exclude some linters from test files
+    - path: _test\.go
+      linters:
+        - errcheck
+        - gosec
+
+    # Exclude generated files
+    - path: \.pb\.go$
+      linters:
+        - all
+    - path: generated.*\.go$
+      linters:
+        - all
+
+  # Maximum issues count per one linter
+  # Set to 0 to disable limit
+  max-issues-per-linter: 0
+
+  # Maximum count of issues with the same text
+  # Set to 0 to disable limit
+  max-same-issues: 0
+
+run:
+  # Timeout for analysis
+  timeout: 5m
+
+  # Include test files
+  tests: true
+
+  # Which dirs to skip
+  skip-dirs:
+    - vendor
+    - third_party
+    - testdata
+    - examples
+    - Godeps
+
+  # Which files to skip
+  skip-files:
+    - ".*\\.pb\\.go$"
+    - ".*generated.*\\.go$"
+
+# Output configuration
+output:
+  # Format: colored-line-number|line-number|json|tab|checkstyle|code-climate
+  format: colored-line-number
+
+  # Print lines of code with issue
+  print-issued-lines: true
+
+  # Print linter name in the end of issue text
+  print-linter-name: true
+
+  # Make issues output unique by line
+  uniq-by-line: true
