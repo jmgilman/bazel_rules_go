@@ -26,21 +26,6 @@ jobs:
           echo "version=$VERSION" >> $GITHUB_OUTPUT
           echo "tag=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
 
-      - name: Verify MODULE.bazel version matches tag
-        run: |
-          # Extract only the module version (first version in the file, inside module() block)
-          MODULE_VERSION=$(awk '/^module\(/,/^\)/{if(/version = /) {gsub(/.*version = "/, ""); gsub(/".*/, ""); print; exit}}' MODULE.bazel)
-          TAG_VERSION="${{ steps.version.outputs.version }}"
-
-          if [ "$MODULE_VERSION" != "$TAG_VERSION" ]; then
-            echo "ERROR: Version mismatch!"
-            echo "  MODULE.bazel version: $MODULE_VERSION"
-            echo "  Git tag version: $TAG_VERSION"
-            exit 1
-          fi
-
-          echo "✅ Version verified: $MODULE_VERSION"
-
       - name: Create release archive
         run: |
           # Create a reproducible tar.gz archive
@@ -97,14 +82,13 @@ jobs:
           ls -lh "$ATTESTATION_NAME"
         id: attestation
 
-      - name: Create GitHub Release
+      - name: Attach artifacts to GitHub Release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ steps.version.outputs.tag }}
-          name: ${{ steps.version.outputs.tag }}
-          generate_release_notes: true
-          draft: false
-          prerelease: false
+          # Don't overwrite release notes - release-please already created the release
+          # with CHANGELOG content. We're just attaching the build artifacts.
+          append_body: true
           files: |
             ${{ steps.archive.outputs.archive_name }}
             ${{ steps.attestation.outputs.attestation_name }}
